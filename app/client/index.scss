@@ -1,0 +1,117 @@
+$blue: rgb(81, 153, 219);
+$red: rgb(227, 7, 28);
+$grey-64: rgb(64, 64, 64);
+$grey-181: rgb(181, 181, 181);
+$grey-213: rgb(213, 213, 213);
+$grey-228: rgb(228, 228, 228);
+
+body {
+  * {
+    box-sizing: border-box;
+    font-family: SegoeUI;
+  }
+}
+
+@font-face {
+  font-family: "SegoeUI";
+  src: url("/static/SegoeUI.ttf");
+  font-style: normal;
+  font-weight: normal;
+}
+
+.autocomplete-wrapper {
+  position: relative;
+  color: $grey-64;
+  font-size: 14px;
+  margin-top: 5px;
+
+  .autocomplete-wrapper__error-message {
+    color: $red;
+    margin-top: 5px;
+  }
+
+  .autocomplete-wrapper__searching-result {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: white;
+    border: 1px solid $grey-228;
+    width: 300px;
+
+    .autocomplete-wrapper__list {
+      .autocomplete-wrapper__list__item  {
+        padding: 5px;
+
+        &.autocomplete-wrapper__list__item_selected {
+          color: white;
+          background: $blue;
+        }
+      }
+
+      .autocomplete-wrapper__list__hidden-cities {
+        color: $grey-181;
+        font-size: 12px;
+        padding: 5px;
+      }
+    }
+
+    .autocomplete-wrapper__searching-result__empty-result {
+      color: $grey-181;
+      padding: 5px;
+    }
+
+    .autocomplete-wrapper__searching-result__server-error {
+      .autocomplete-wrapper__searching-result__server-error__message {
+        color: $grey-181;
+        padding: 5px;
+      }
+
+      .autocomplete-wrapper__searching-result__server-error__refresh {
+        background: $blue;
+        color: white;
+        padding: 5px;
+      }
+    }
+
+    .autocomplete-wrapper__searching-result__results-loading {
+      display: flex;
+      align-items: center;
+      color: $grey-181;
+      padding: 5px;
+      line-height: 20px;
+
+      img {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+input {
+  width: 250px;
+  line-height: 20px;
+  padding: 5px;
+  outline: none;
+
+  &.autocomplete-wrapper__input_error {
+    border: 2px solid $red;
+  }
+
+  &::placeholder {
+    color: $grey-181;
+  }
+
+  &:focus {
+    border: 2px solid $blue;
+
+    &::placeholder {
+      color: $grey-213;
+    }
+  }
+}
+
+.input-for-test {
+  margin-top: 10px;
+}
