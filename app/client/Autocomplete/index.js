@@ -28,7 +28,7 @@ export class Autocomplete extends React.Component {
     this.isPristine = true;
 
     this.onChange = this.onChange.bind(this);
-    this.onChangeDebounced = _.debounce(this.onChange, DEBOUNCE_INPUT_DELAY);
+    this.onChangeDebounced = _.debounce(this.onChange, DEBOUNCE_INPUT_DELAY, { leading: true });
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onBlur = this.onBlur.bind(this);
     this.onFocus = this.onFocus.bind(this);
@@ -232,7 +232,7 @@ export class Autocomplete extends React.Component {
         serverError,
         loadingData
       },
-      inputElem
+      timeoutBeforeShowingLoadingIcon
     } = this;
 
     const isNeededKeyCode = _.find(KEY_CODES, (x) => x === keyCode);
@@ -244,7 +244,7 @@ export class Autocomplete extends React.Component {
 
       switch (keyCode) {
         case 13: {
-          if (loadingData) return;
+          if (loadingData || timeoutBeforeShowingLoadingIcon) return;
 
           if (serverError) {
             return this.refreshSearching();
