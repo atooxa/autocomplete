@@ -25,6 +25,7 @@ export class Autocomplete extends React.Component {
       serverError: false
     };
     this.timestampOfStartingToShowLoadingIcon = Date.now();
+    this.isPristine = true;
 
     this.onChange = this.onChange.bind(this);
     this.onChangeDebounced = _.debounce(this.onChange, DEBOUNCE_INPUT_DELAY);
@@ -32,6 +33,10 @@ export class Autocomplete extends React.Component {
     this.onBlur = this.onBlur.bind(this);
     this.onFocus = this.onFocus.bind(this);
     this.fetchAndHandleAutocompleteList = this.fetchAndHandleAutocompleteList.bind(this);
+    this.selectItem = this.selectItem.bind(this);
+    this.refreshSearching = this.refreshSearching.bind(this);
+    this.onDocumentMouseDown = this.onDocumentMouseDown.bind(this);
+    this.focusNextInput = this.focusNextInput.bind(this);
   }
 
   getInitialState() {
@@ -65,6 +70,10 @@ export class Autocomplete extends React.Component {
 
       return;
     }
+
+    this.setState({
+      chosenItem: null
+    });
 
     if (emptyInputError) return;
 
@@ -205,6 +214,13 @@ export class Autocomplete extends React.Component {
       });
   }
 
+  refreshSearching() {
+    this.fetchAndHandleAutocompleteList({
+      query: this.inputElem.value,
+      loadingAnimationDelay: 0
+    });
+  }
+
   onKeyDown(e) {
     const {
       keyCode
@@ -213,7 +229,6 @@ export class Autocomplete extends React.Component {
       state: {
         filteredItems,
         selectedItemIndex,
-        chosenItem,
         serverError,
         loadingData
       },
@@ -232,24 +247,10 @@ export class Autocomplete extends React.Component {
           if (loadingData) return;
 
           if (serverError) {
-            return this.fetchAndHandleAutocompleteList({ query: inputElem.value, loadingAnimationDelay: 0 });
+            return this.refreshSearching();
           }
 
-          _.merge(updatedState, {
-            selectedItemIndex: 0,
-            filteredItems: [],
-            hiddenItemsLength: 0,
-            chosenItem: filteredItems[selectedItemIndex] || (chosenItem.City === inputElem.value && chosenItem)
-          });
-
-          inputElem.value = updatedState.chosenItem ? updatedState.chosenItem.City : inputElem.value;
-
-          if (updatedState.chosenItem) {
-            const inputs = $('input');
-            const nextInputIndex = inputs.index(inputElem) + 1;
-
-            setTimeout(() => inputs.eq(nextInputIndex).focus(), 0);
-          }
+          this.selectItem(selectedItemIndex);
 
           break;
         }
@@ -274,6 +275,13 @@ export class Autocomplete extends React.Component {
           _.merge(updatedState, {
             filteredItems: [],
           });
+
+          break;
+        }
+
+        case 9: {
+          this.onBlur();
+          this.focusNextInput();
 
           break;
         }
@@ -318,14 +326,63 @@ export class Autocomplete extends React.Component {
 
   onFocus() {
     const {
-      inputElem
+      state: {
+        chosenItem
+      },
+      inputElem,
     } = this;
 
-    inputElem.setSelectionRange(0, inputElem.value.length);
+    this.isPristine = false;
+
+    if (chosenItem) {
+      inputElem.setSelectionRange(0, inputElem.value.length);
+    } else {
+      setTimeout(() => this.onChange(), 0)
+    }
 
     this.setState({
       emptyInputError: false
     });
+  }
+
+  selectItem(itemIndex) {
+    const {
+      state: {
+        filteredItems,
+        chosenItem
+      },
+      inputElem
+    } = this;
+
+    const newChosenItem = filteredItems[itemIndex] || (chosenItem && chosenItem.City === inputElem.value && chosenItem);
+
+    this.setState({
+      selectedItemIndex: 0,
+      filteredItems: [],
+      hiddenItemsLength: 0,
+      chosenItem: newChosenItem
+    });
+
+    inputElem.value = newChosenItem ? newChosenItem.City : inputElem.value;
+
+    if (newChosenItem) {
+      this.focusNextInput();
+    }
+
+    return newChosenItem;
+  }
+
+  focusNextInput() {
+    const inputs = $('input');
+    const nextInputIndex = inputs.index(this.inputElem) + 1;
+
+    setTimeout(() => inputs.eq(nextInputIndex).focus(), 0);
+  }
+
+  onDocumentMouseDown(e) {
+    if (!this.autocompleteWrapper.contains(e.target) && !this.isPristine) {
+      this.onBlur();
+    }
   }
 
   shouldComponentUpdate(nextProps, nextState) {
@@ -350,6 +407,13 @@ export class Autocomplete extends React.Component {
 
   componentDidMount() {
     this.inputElem = document.querySelector('.autocomplete-wrapper__input');
+    this.autocompleteWrapper = document.querySelector('.autocomplete-wrapper');
+
+    document.addEventListener('mousedown', this.onDocumentMouseDown);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('mousedown', this.onDocumentMouseDown);
   }
 
   render() {
@@ -362,7 +426,9 @@ export class Autocomplete extends React.Component {
         emptyInputError,
         serverError,
         loadingData
-      }
+      },
+      selectItem,
+      refreshSearching
     } = this;
 
     const showResult = !!filteredItems.length || emptyResult || serverError || loadingData;
@@ -375,7 +441,6 @@ export class Autocomplete extends React.Component {
         <Input emptyInputError={emptyInputError}
                onChange={this.onChangeDebounced}
                onKeyDown={this.onKeyDown}
-               onBlur={this.onBlur}
                onFocus={this.onFocus}
         />
 
@@ -387,6 +452,8 @@ export class Autocomplete extends React.Component {
                          filteredItems={filteredItems}
                          hiddenItemsLength={hiddenItemsLength}
                          selectedItemIndex={selectedItemIndex}
+                         selectItem={selectItem}
+                         refreshSearching={refreshSearching}
         />
       </div>
     );

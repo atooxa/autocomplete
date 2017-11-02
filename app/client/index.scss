@@ -41,6 +41,7 @@ body {
     .autocomplete-wrapper__list {
       .autocomplete-wrapper__list__item  {
         padding: 5px;
+        cursor: pointer;
 
         &.autocomplete-wrapper__list__item_selected {
           color: white;
@@ -70,6 +71,7 @@ body {
         background: $blue;
         color: white;
         padding: 5px;
+        cursor: pointer;
       }
     }
 

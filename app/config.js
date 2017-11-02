@@ -1,11 +1,10 @@
 export const DEBOUNCE_INPUT_DELAY = 300;
 export const KEY_CODES = {
-  left: 37,
   up: 38,
-  right: 39,
   down: 40,
   escape: 27,
-  enter: 13
+  enter: 13,
+  tab: 9
 };
 export const MIN_LOADING_ICON_SHOWING = 1000;
 export const DELAY_BEFORE_SHOWING_LOADING_ICON = 500;

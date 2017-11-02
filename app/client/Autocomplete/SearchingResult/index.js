@@ -12,6 +12,8 @@ export default class SearchingResult extends React.Component {
       filteredItems,
       hiddenItemsLength,
       selectedItemIndex,
+      selectItem,
+      refreshSearching
     } = this.props;
 
     if (!visible) return null;
@@ -32,7 +34,11 @@ export default class SearchingResult extends React.Component {
             Что-то пошло не так. Проверьте соединение с интернетом и попробуйте еще раз
           </div>
 
-          <div className="autocomplete-wrapper__searching-result__server-error__refresh">Обновить</div>
+          <div className="autocomplete-wrapper__searching-result__server-error__refresh"
+               onClick={refreshSearching}
+          >
+            Обновить
+          </div>
         </div>
       )
       : null;
@@ -52,6 +58,7 @@ export default class SearchingResult extends React.Component {
                    hiddenItemsLength={hiddenItemsLength}
                    filteredItems={filteredItems}
                    selectedItemIndex={selectedItemIndex}
+                   selectItem={selectItem}
         />
         {notFound}
         {serverErrorMessage}

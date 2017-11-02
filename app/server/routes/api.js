@@ -15,7 +15,7 @@ const routerAPI = express.Router();
 routerAPI
   .use(bodyParser.json())
   .post('/autocomplete', (req, res) => {
-    const regExp = new RegExp(`^${req.body.query}`, 'i');
+    const regExp = new RegExp(`^${_.escapeRegExp(req.body.query)}`, 'i');
 
     const filteredItems = _.filter(cities, (city) => {
       return regExp.test(city.City);

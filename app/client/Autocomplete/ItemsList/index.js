@@ -11,7 +11,8 @@ export default class ItemsList extends React.Component {
       visible,
       hiddenItemsLength,
       filteredItems,
-      selectedItemIndex
+      selectedItemIndex,
+      selectItem
     } = this.props;
 
     if (!visible) return null;
@@ -34,6 +35,7 @@ export default class ItemsList extends React.Component {
               + (index === selectedItemIndex ? ' autocomplete-wrapper__list__item_selected' : '')
             }
                  key={item.Id}
+                 onClick={selectItem.bind(this, index)}
             >
               {item.City}
             </div>
